@@ -41,7 +41,7 @@ def process_link(links, api_key,host):
         # Find and click the "continuer" button
         while True:
             try:
-                WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "subButton")))
+                WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, "subButton")))
             except:
                 # Retry if the CAPTCHA is not solved
                 print("CAPTCHA not solved, retrying...")
