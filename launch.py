@@ -16,7 +16,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 
 
-def scrape_wawacity(url):
+def scrape_wawacity(url,host):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     links = []
@@ -24,17 +24,17 @@ def scrape_wawacity(url):
     for link_row in soup.find_all("tr", class_="link-row"):
         link = link_row.find("a", class_="link")
         host_name = link_row.find("td", class_="text-center")
-        preferred_host = "Turbobit"  # Name of your preferred host
+        preferred_host = host  # Name of your preferred host
         if link and host_name and preferred_host in host_name.text:
             print(link["href"])
             links.append(link["href"])
 
     return links
 
-def process_link(links, api_key):
+def process_link(links, api_key,host):
     driver = uc.Chrome()
     for link in links:
-        print(link)
+       
         driver.get(link)
 
         # Find and click the "continuer" button
@@ -44,7 +44,7 @@ def process_link(links, api_key):
             except:
                 # Retry if the CAPTCHA is not solved
                 print("CAPTCHA not solved, retrying...")
-                driver.refresh()
+                driver.get(link)
                 continue
 
             try:
@@ -53,26 +53,18 @@ def process_link(links, api_key):
                 form = driver.find_element(By.ID, "myForm")
                 form.submit()
 
-                link_element = driver.find_element(By.XPATH, "//a[contains(@href, 'turbobit')]")
+                link_element = driver.find_element(By.XPATH, "//a[contains(@href, '"+host.lower()+"')]")
 
                 # Extract the link from the href attribute
                 link = link_element.get_attribute("href")
-
-                api_endpoint = f"https://api.alldebrid.com/v4/link/unlock?agent=myAppName&apikey={api_key}&link={link}"
-                response = requests.get(api_endpoint)
-
-                data = response.json()["data"]
-                scraped_link = data["link"]
-
-                print(scraped_link)
-
+               
                 filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")  # Path to the output file
 
                 if not os.path.exists(filepath):
                     open(filepath, 'w').close()  # Create the file if it doesn't exist
 
                 with open(filepath, "a+", newline="", encoding="utf-8") as f:
-                    f.write(scraped_link + "\n")
+                    f.write(link + "\n")
                 
             except NoSuchElementException:
                 print("Element not found, retrying...")
@@ -84,20 +76,37 @@ def process_link(links, api_key):
 
             break  # Exit the while loop once the link is processed successfully
 
-        time.sleep(5)  # Wait for the browser to finish processing before closing the window
+        time.sleep(3)  # Wait for the browser to finish processing before closing the window
 
     driver.quit()
 
-def download_series(url, api_key):
-    links = scrape_wawacity(url)
-    process_link(links, api_key)
+def download_series(url, api_key,host):
+    links = scrape_wawacity(url,host)
+    process_link(links, api_key,host)
+
+def read_links_from_file(api_key):
+    filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
+    
+    links = []
+    if os.path.exists(filepath):
+        with open(filepath, "r", encoding="utf-8") as f:
+            for line in f:
+                link = line.strip()  # enlever les espaces blancs autour du lien
+                api_endpoint = f"https://api.alldebrid.com/v4/link/unlock?agent=myAppName&apikey={api_key}&link={link}"
+                response = requests.get(api_endpoint)
+
+                data = response.json()["data"]
+                scraped_link = data["link"]
+                print(scraped_link)
+
+                links.append(scraped_link)
 
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
         self.master.title("Télécharger une série")
-        self.master.geometry("400x200")
+        self.master.geometry("400x550")
         self.create_widgets()
 
     def create_widgets(self):
@@ -106,6 +115,17 @@ class Application(tk.Frame):
 
         self.url_entry = tk.Entry(self.master, width=50)
         self.url_entry.pack()
+
+        self.hosts = ["Uptobox", "Turbobit", "Nitroflare","Rapidgator","1fichier","Fikper","Filerice"]  # liste de noms d'hébergeurs
+
+        self.host_label = tk.Label(self.master, text="Choose a hosting service:")
+        self.host_label.pack()
+
+        self.host_var = tk.StringVar()
+        self.host_var.set(self.hosts[0])  # valeur par défaut
+
+        self.host_menu = tk.OptionMenu(self.master, self.host_var, *self.hosts)
+        self.host_menu.pack()
 
         self.api_label = tk.Label(self.master, text="API key")
         self.api_label.pack()
@@ -116,6 +136,9 @@ class Application(tk.Frame):
         self.download_button = tk.Button(self.master, text="Télécharger", command=self.start_download)
         self.download_button.pack()
 
+        self.all_button = tk.Button(self.master, text="allfiles", command=self.read_links_from_file)
+        self.all_button.pack()
+
         self.output_label = tk.Label(self.master, text="Résultat")
         self.output_label.pack()
 
@@ -125,14 +148,19 @@ class Application(tk.Frame):
     def start_download(self):
         url = self.url_entry.get()
         api_key = self.api_entry.get()
+        host = self.host_var.get()
         if url and api_key:
             self.download_button.config(state=tk.DISABLED)
             self.output_text.delete('1.0', tk.END)
-            download_series(url, api_key)
+            download_series(url, api_key,host)
             self.download_button.config(state=tk.NORMAL)
+    def read_links_from_file(self):
+        api_key = self.api_entry.get()
+        read_links_from_file(api_key)
+        
+        
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = Application(master=root)
     app.mainloop()
-
