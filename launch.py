@@ -110,6 +110,7 @@ class Application(tk.Frame):
         self.master.title("Downloader wawa/alldebrid")
         self.master.geometry("400x550")
         self.create_widgets()
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def create_widgets(self):
         self.url_label = tk.Label(self.master, text="Wawacity url")
@@ -168,8 +169,11 @@ class Application(tk.Frame):
                 response = requests.get(link)
                 f.write(response.content)
             print(self.download_path)
-
-      
+    def on_closing(self):
+        filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
+        with open(filepath, "w", encoding="utf-8") as f:
+          f.write("")
+        self.master.destroy()
         
    
   
