@@ -87,20 +87,24 @@ def download_series(url, api_key,host):
 
 def read_links_from_file(api_key):
     filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
-    
+    invalid_links_file = os.path.join(os.getcwd(), "invalidLinks.bin")
     links = []
     if os.path.exists(filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             for line in f:
                 link = line.strip()  # enlever les espaces blancs autour du lien
                 api_endpoint = f"https://api.alldebrid.com/v4/link/unlock?agent=myAppName&apikey={api_key}&link={link}"
-                response = requests.get(api_endpoint)
-
-                data = response.json()["data"]
-                scraped_link = data["link"]
-                print(scraped_link)
-
-                links.append(scraped_link)
+                try:
+                    response = requests.get(api_endpoint)
+                    data = response.json()["data"]
+                    scraped_link = data["link"]
+                    print(scraped_link)
+                    links.append(scraped_link)
+                except:
+                    # Ajouter le lien non valide à un fichier binaire
+                    with open(invalid_links_file, "ab") as f:
+                        f.write(link.encode("utf-8") + b"\n")
+                    continue
     return links
 
 class Application(tk.Frame):
