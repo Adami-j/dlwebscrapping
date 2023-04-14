@@ -13,6 +13,7 @@ import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+from tkinter import filedialog  # Importer filedialog séparément
 
 
 
@@ -100,17 +101,18 @@ def read_links_from_file(api_key):
                 print(scraped_link)
 
                 links.append(scraped_link)
+    return links
 
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.title("Télécharger une série")
+        self.master.title("Downloader wawa/alldebrid")
         self.master.geometry("400x550")
         self.create_widgets()
 
     def create_widgets(self):
-        self.url_label = tk.Label(self.master, text="URL du site")
+        self.url_label = tk.Label(self.master, text="Wawacity url")
         self.url_label.pack()
 
         self.url_entry = tk.Entry(self.master, width=50)
@@ -133,13 +135,13 @@ class Application(tk.Frame):
         self.api_entry = tk.Entry(self.master, width=50, show="*")
         self.api_entry.pack()
 
-        self.download_button = tk.Button(self.master, text="Télécharger", command=self.start_download)
+        self.download_button = tk.Button(self.master, text="Scrap links", command=self.start_download)
         self.download_button.pack()
 
-        self.all_button = tk.Button(self.master, text="allfiles", command=self.read_links_from_file)
+        self.all_button = tk.Button(self.master, text="AllDebrid process", command=self.read_links_from_file)
         self.all_button.pack()
 
-        self.output_label = tk.Label(self.master, text="Résultat")
+        self.output_label = tk.Label(self.master, text="Files")
         self.output_label.pack()
 
         self.output_text = tk.Text(self.master, height=20, width=80)
@@ -156,8 +158,21 @@ class Application(tk.Frame):
             self.download_button.config(state=tk.NORMAL)
     def read_links_from_file(self):
         api_key = self.api_entry.get()
-        read_links_from_file(api_key)
+        links =read_links_from_file(api_key)
+        # Ouvrir une boîte de dialogue de sélection de dossier
+        self.download_path = tk.filedialog.askdirectory(initialdir='')
+        for link in links:
+            filename = link.split("/")[-1]  # Extraire le nom du fichier à partir de l'URL
+            filepath = os.path.join(self.download_path, filename)
+            with open(filepath, "wb") as f:
+                response = requests.get(link)
+                f.write(response.content)
+            print(self.download_path)
+
+      
         
+   
+  
         
 
 if __name__ == "__main__":
