@@ -57,12 +57,12 @@ puis exécutez
 Lancez l'application avec python3 launch.py dans l'invite de commande ou avec l'interpréteur Python en faisant un clic droit et en sélectionnant ******.
 
 ### 3-
-Donc lorsque vous êtes dans l'application image
+Donc lorsque vous êtes dans l'application ![image](https://user-images.githubusercontent.com/71751140/232118603-38e2f88c-28ea-4ff2-914a-a8be63b1e094.png)
 Vous pouvez voir 3 boutons :
 Le premier permet de rechercher un hébergeur particulier (par exemple : vous voulez télécharger des liens Turbobit -> sélectionnez-le)
-Le deuxième lance la récupération de tous les liens dans l'URL fourni en premier. Par exemple : image
+Le deuxième lance la récupération de tous les liens dans l'URL fourni en premier. Par exemple : ![image](https://user-images.githubusercontent.com/71751140/232122749-cdca4760-e310-4ea1-a3ef-a49dca8449ec.png)
 
-Lorsque vous récupérez les liens, vous pouvez observer qu'un nouveau fichier a été créé, "scrappedLinks.txt", qui sera supprimé lorsque vous arrêterez l'application. image
+Lorsque vous récupérez les liens, vous pouvez observer qu'un nouveau fichier a été créé, "scrappedLinks.txt", qui sera supprimé lorsque vous arrêterez l'application. ![image](https://user-images.githubusercontent.com/71751140/232122822-6e6e4182-dba0-4f68-a2d4-950ab2aed48c.png)
 
 Ensuite, si vous souhaitez télécharger ces fichiers, récupérez votre clé d'API sur https://alldebrid.fr/ et cliquez sur le processus Alldebrid. Vous verrez une fenêtre de recherche : sélectionnez le dossier où vous souhaitez télécharger et attendez. 
 
