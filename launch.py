@@ -1,8 +1,10 @@
 import os
+import sys
 import time
 import tkinter as tk
 import platform
 from tkinter import filedialog  # Importer filedialog séparément
+import signal
 
 import requests
 import selenium.webdriver.support.expected_conditions as EC
@@ -109,7 +111,9 @@ def read_links_from_file(api_key):
                     continue
     return links
 
+
 class Application(tk.Frame):
+
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
@@ -119,6 +123,8 @@ class Application(tk.Frame):
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def create_widgets(self):
+        signal.signal(signal.SIGTERM, self.handle_exit)
+        signal.signal(signal.SIGINT, self.handle_exit)
         self.url_label = tk.Label(self.master, text="Wawacity url")
         self.url_label.pack()
 
@@ -175,17 +181,29 @@ class Application(tk.Frame):
                 response = requests.get(link)
                 f.write(response.content)
             print(self.download_path)
+
     def on_closing(self):
         filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
         with open(filepath, "w", encoding="utf-8") as f:
-          f.write("")
+            f.write("")
+        self.output_text.delete("1.0", tk.END)
         self.master.destroy()
-        
+
+    def handle_exit(signum, frame, self):
+
+        filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write("")
+        sys.exit(0)
+
+
    
   
-        
+
 
 if __name__ == "__main__":
+
     root = tk.Tk()
     app = Application(master=root)
     app.mainloop()
+
