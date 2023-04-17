@@ -1,24 +1,26 @@
-import tkinter as tk
-import time
-import sys
 import os
-import requests
-import json
-from bs4 import BeautifulSoup
-
-import undetected_chromedriver as uc
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.remote.webdriver import By
-import selenium.webdriver.support.expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException
+import time
+import tkinter as tk
+import platform
 from tkinter import filedialog  # Importer filedialog séparément
 
+import requests
+import selenium.webdriver.support.expected_conditions as EC
+import undetected_chromedriver as uc
+from bs4 import BeautifulSoup
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.remote.webdriver import By
+from selenium.webdriver.support.wait import WebDriverWait
+
+import urllib3
+if platform.system() == 'Darwin':  # Vérifie si le système d'exploitation est MacOS
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    os.environ['SSL_CERT_FILE'] = '/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/certifi/cacert.pem'
 
 
 def scrape_wawacity(url,host):
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
+
     soup = BeautifulSoup(response.text, "html.parser")
     links = []
 
