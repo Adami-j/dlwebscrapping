@@ -18,5 +18,6 @@ pip install requests
 pip install beautifulsoup4
 pip install undetected-chromedriver
 pip install selenium
+pip install urllib3
 
 echo Terminé.
