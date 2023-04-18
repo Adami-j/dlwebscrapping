@@ -3,6 +3,7 @@ import sys
 import time
 import tkinter as tk
 import platform
+from mailbox import mbox
 from tkinter import filedialog  # Importer filedialog séparément
 import signal
 
@@ -19,6 +20,29 @@ if platform.system() == 'Darwin':  # Vérifie si le système d'exploitation est 
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     os.environ['SSL_CERT_FILE'] = '/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/certifi/cacert.pem'
 
+def verifValidity(url):
+    response = requests.get(url, verify=False)
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    links = []
+
+    table = soup.find("table", {"id": "DDLLinks"})
+    hostname = ""
+    if table is None:
+        print("La table de liens n'a pas été trouvée.")
+    else:
+        link_row = table.find_all("tr", class_="link-row")[1]
+        for link_row in table.find_all("tr", class_="link-row"):
+            link = link_row.find("a", class_="link")
+            host_name = link_row.find("td", class_="text-center")
+            if link and host_name:
+                if hostname == "":
+                    hostname = host_name.text
+                elif host_name.text == hostname:
+                    break
+
+                links.append(host_name.text)
+    return links
 
 def scrape_wawacity(url,host):
     response = requests.get(url, verify=False)
@@ -131,13 +155,14 @@ class Application(tk.Frame):
         self.url_entry = tk.Entry(self.master, width=50)
         self.url_entry.pack()
 
-        self.hosts = ["Uptobox", "Turbobit", "Nitroflare","Rapidgator","1fichier","Fikper","Filerice"]  # liste de noms d'hébergeurs
+        self.hosts = [""]  # liste de noms d'hébergeurs
 
         self.host_label = tk.Label(self.master, text="Choose a hosting service:")
         self.host_label.pack()
 
         self.host_var = tk.StringVar()
-        self.host_var.set(self.hosts[0])  # valeur par défaut
+        if self.hosts:
+            self.host_var.set(self.hosts[0])
 
         self.host_menu = tk.OptionMenu(self.master, self.host_var, *self.hosts)
         self.host_menu.pack()
@@ -148,7 +173,7 @@ class Application(tk.Frame):
         self.api_entry = tk.Entry(self.master, width=50, show="*")
         self.api_entry.pack()
 
-        self.download_button = tk.Button(self.master, text="Scrap links", command=self.start_download)
+        self.download_button = tk.Button(self.master, text="Verify hosts", command=self.start_download)
         self.download_button.pack()
 
         self.all_button = tk.Button(self.master, text="AllDebrid process", command=self.read_links_from_file)
@@ -164,11 +189,26 @@ class Application(tk.Frame):
         url = self.url_entry.get()
         api_key = self.api_entry.get()
         host = self.host_var.get()
-        if url and api_key:
-            self.download_button.config(state=tk.DISABLED)
-            self.output_text.delete('1.0', tk.END)
-            download_series(url, api_key,host)
-            self.download_button.config(state=tk.NORMAL)
+        print("cc")
+        if url:
+            if not host :
+
+                hosts_list = verifValidity(url)
+                
+                if len(hosts_list) == 0:
+                    mbox.showerror("Error", "none host avaible")
+                self.host_var.set(hosts_list[0])
+                menu = self.host_menu['menu']
+                menu.delete(0, "end")
+                for host in hosts_list:
+                    menu.add_command(label=host, command=tk._setit(self.host_var, host))
+
+            else:
+                self.download_button.config(state=tk.DISABLED)
+                self.output_text.delete('1.0', tk.END)
+                download_series(url, api_key,host)
+                self.download_button.config(state=tk.NORMAL)
+
     def read_links_from_file(self):
         api_key = self.api_entry.get()
         links =read_links_from_file(api_key)
@@ -196,14 +236,8 @@ class Application(tk.Frame):
             f.write("")
         sys.exit(0)
 
-
-   
-  
-
-
 if __name__ == "__main__":
 
     root = tk.Tk()
     app = Application(master=root)
     app.mainloop()
-
