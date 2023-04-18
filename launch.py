@@ -60,10 +60,9 @@ def scrape_wawacity(url,host):
 
     return links
 
-def process_link(links, api_key,host):
+def process_link(links,host):
     driver = uc.Chrome()
     for link in links:
-       
         driver.get(link)
 
         # Find and click the "continuer" button
@@ -109,9 +108,9 @@ def process_link(links, api_key,host):
 
     driver.quit()
 
-def download_series(url, api_key,host):
+def download_series(url,host):
     links = scrape_wawacity(url,host)
-    process_link(links, api_key,host)
+    process_link(links,host)
 
 def read_links_from_file(api_key):
     filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
@@ -206,7 +205,7 @@ class Application(tk.Frame):
             else:
                 self.download_button.config(state=tk.DISABLED)
                 self.output_text.delete('1.0', tk.END)
-                download_series(url, api_key,host)
+                download_series(url,host)
                 self.download_button.config(state=tk.NORMAL)
 
     def read_links_from_file(self):
