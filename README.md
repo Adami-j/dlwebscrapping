@@ -1,5 +1,7 @@
 # EN
 
+# Exe download link : https://uptobox.com/07xb0txdgk4g
+
 # Description
 The purpose of this application is to download files from a website called "Wawacity" using the "AllDebrid" service. The application allows the user to specify the Wawacity site URL, the AllDebrid API key, and the desired hosting service name (e.g., Uptobox, Turbobit, etc.). The application then scrapes the download links from the Wawacity site, unlocks them with AllDebrid, and saves them to a text file. The user can also load previously saved links from the text file and download the corresponding files. The application also allows the user to select a download folder to save the downloaded files. Additionally, the application clears the content of the text file upon closing.
 
@@ -34,6 +36,9 @@ and click on Alldebrid process, you'll see finder window : select folder where y
 
 
 # FR
+
+# Lien de téléchargement de l'exécutable : https://uptobox.com/07xb0txdgk4g
+
 # Description
 
 Le but de cette application est de télécharger des fichiers depuis un site web appelé "Wawacity" en utilisant le service "AllDebrid". L'application permet à l'utilisateur de spécifier l'URL du site Wawacity, la clé d'API AllDebrid et le nom du service d'hébergement souhaité (par exemple, Uptobox, Turbobit, etc.). L'application récupère ensuite les liens de téléchargement du site Wawacity, les déverrouille avec AllDebrid et les enregistre dans un fichier texte. L'utilisateur peut également charger les liens précédemment enregistrés à partir du fichier texte et télécharger les fichiers correspondants. L'application permet également à l'utilisateur de sélectionner un dossier de téléchargement pour enregistrer les fichiers téléchargés. De plus, l'application efface le contenu du fichier texte lors de la fermeture.
