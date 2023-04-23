@@ -178,12 +178,6 @@ class Application(tk.Frame):
         self.all_button = tk.Button(self.master, text="AllDebrid process", command=self.read_links_from_file)
         self.all_button.pack()
 
-        self.output_label = tk.Label(self.master, text="Files")
-        self.output_label.pack()
-
-        self.output_text = tk.Text(self.master, height=20, width=80)
-        self.output_text.pack()
-
     def start_download(self):
         url = self.url_entry.get()
         api_key = self.api_entry.get()
@@ -204,7 +198,6 @@ class Application(tk.Frame):
 
             else:
                 self.download_button.config(state=tk.DISABLED)
-                self.output_text.delete('1.0', tk.END)
                 download_series(url,host)
                 self.download_button.config(state=tk.NORMAL)
 
@@ -220,12 +213,18 @@ class Application(tk.Frame):
                 response = requests.get(link)
                 f.write(response.content)
             print(self.download_path)
+        
+        
+        filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write("")
+        sys.exit(0)
+        
 
     def on_closing(self):
         filepath = os.path.join(os.getcwd(), "scrappedLinks.txt")
         with open(filepath, "w", encoding="utf-8") as f:
             f.write("")
-        self.output_text.delete("1.0", tk.END)
         self.master.destroy()
 
     def handle_exit(signum, frame, self):
